@@ -32,18 +32,29 @@ def get_page_element(html):
 
     elements = ElementPage(html)
     result = elements.parent_page_element()
-    #print(result)
     return result
 
 def save_data(result):
     """pass"""
     
     wow = []
-    for rows in result:
+    for rows in result:  # [[],[]]
         words = rows.split() 
         for row in words:
-            wow.append(row)
-    print(wow)
+            wow.append(row)  # []
+    # print(wow)
+    
+    bob = []
+    fin_result = []
+    for a in wow:
+        if a not in bob:
+            bob.append(a)
+  
+    for row in bob:
+        row_count = wow.count(row)
+        fin_result.append([row, row_count])
+    finn_result = sorted(fin_result)    
+    print(finn_result)
 
     
 if __name__ == '__main__':
