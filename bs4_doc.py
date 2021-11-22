@@ -4,7 +4,7 @@ import requests
 from page_obj.parent_page import HttpQuery
 from page_obj.parent_page import ElementPage
 import os
-
+import re 
 
 
 def http_query(url):
@@ -36,24 +36,33 @@ def get_page_element(html):
 
 def save_data(result):
     """pass"""
-    
+   
+    # двумерный список [[],[]] делаем [] простым списком
     wow = []
     for rows in result:  # [[],[]]
-        words = rows.split() 
+        words = rows.split() # разделение на подстроки
         for row in words:
-            wow.append(row)  # []
-    # print(wow)
+            # подумать нужны ли такие слова, It's, you’r
+            # может быть добавить их в список?
+            # найти словасостоящие только из латинских букв
+            pattern = r"[^A-Za-z]"
+            if re.search(pattern, row):
+                pass
+            else:
+                wow.append(row.lower())  # []
+    print(wow)
     
-    bob = []
+    bob = []  # список уникальных слов   
     fin_result = []
     for a in wow:
         if a not in bob:
             bob.append(a)
   
     for row in bob:
-        row_count = wow.count(row)
+        row_count = wow.count(row) # подсчет кол-ва вхождений слов в списке
         fin_result.append([row, row_count])
-    finn_result = sorted(fin_result)    
+    # сортировка двумерного списка, по [[a,b], [a1,b1]] b, по убыванию reverse = True
+    finn_result = sorted(fin_result, key=lambda x: x[1], reverse=True)    
     print(finn_result)
 
     
