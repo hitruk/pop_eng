@@ -31,10 +31,37 @@ def get_page_element(html):
     """ Get page elements and text  """
 
     elements = ElementPage(html)
-    result = elements.parent_page_element()
-    return result
+    result_p = elements.parent_page_element()
+    return result_p
 
-def save_data(result):
+def modify_list(result_p):
+    """ modify the resulting list """
+    
+    result = []
+    for row in result_p:
+        new_p = row.split()
+        #print(new_p[0])
+        #! переделать этот блок с регулярным выражением на более короткий !
+        pattern = r"[^A-Za-z]"
+        if re.search(pattern, new_p[0]):
+            pass
+        else:
+            #print(new_p[0]) 
+            result.append(new_p[0])
+    
+    data_word = []        
+    for row in result:
+        row_count = result.count(row)
+        #print(row, row_count)
+        data = (row, row_count)
+        if data not in data_word:
+            data_word.append(data)
+        
+    #print(data_word)
+    finn_result = sorted(data_word, key=lambda x: x[1], reverse=True)
+    print(finn_result)
+
+def save_data(result_p):
     """pass"""
    
     # двумерный список [[],[]] делаем [] простым списком
@@ -77,6 +104,7 @@ if __name__ == '__main__':
         save_html(html)
 
     html = open_html()
-    result = get_page_element(html)
-    save_data(result)
+    result_p = get_page_element(html)
+    modify_list(result_p)
+    #save_data(result)
 
