@@ -5,6 +5,8 @@ from page_obj.parent_page import HttpQuery
 from page_obj.parent_page import ElementPage
 import os
 import re 
+from db_obj.db import DataBase
+from config import config
 
 
 def http_query(url):
@@ -28,13 +30,21 @@ def open_html():
     return html
 
 def get_page_element(html):
-    """ Get page elements and text  """
+    """ Get page elements and text """
 
     elements = ElementPage(html)
     result_p = elements.parent_page_element()
     return result_p
 
-def modify_list(result_p):
+def get_id_attribute():
+    """ Select id from table resource """
+
+    conn = DataBase()
+    id_res = conn.select_id_resource()
+    return id_res
+
+  
+def modify_list(result_p, id_res):
     """ modify the resulting list """
     
     result = []
@@ -55,49 +65,34 @@ def modify_list(result_p):
         #print(row, row_count)
         data = (row, row_count)
         if data not in data_word:
+            #print(data)
             data_word.append(data)
         
     #print(data_word)
     finn_result = sorted(data_word, key=lambda x: x[1], reverse=True)
     print(finn_result)
 
-def save_data(result_p):
-    """pass"""
-   
-    # двумерный список [[],[]] делаем [] простым списком
-    wow = []
-    for rows in result:  # [[],[]]
-        words = rows.split() # разделение на подстроки
-        for row in words:
-            # подумать нужны ли такие слова, It's, you’r
-            # может быть добавить их в список?
-            # найти словасостоящие только из латинских букв
-            pattern = r"[^A-Za-z]"
-            if re.search(pattern, row):
-                pass
-            else:
-                wow.append(row.lower())  # []
-    print(wow)
     
-    bob = []  # список уникальных слов   
-    fin_result = []
-    for a in wow:
-        if a not in bob:
-            bob.append(a)
-  
-    for row in bob:
-        row_count = wow.count(row) # подсчет кол-ва вхождений слов в списке
-        fin_result.append([row, row_count])
-    # сортировка двумерного списка, по [[a,b], [a1,b1]] b, по убыванию reverse = True
-    finn_result = sorted(fin_result, key=lambda x: x[1], reverse=True)    
-    print(finn_result)
+    data = []
+    for row in finn_result:
+        row_one = (id_res, row[0], row[1])
+        print(row_one)
+        data.append(row_one)
+    return data
 
-    
+
+def save_data(data):
+    """ Insert into word(id_resource, word, count_word) """
+
+    conn = DataBase()
+    conn.insert_world(data)    
+
+
 if __name__ == '__main__':
 
     url = 'https://www.crummy.com/software/BeautifulSoup/bs4/doc/'  
     
-    if os.path.exists('../pop_eng/parent_page.html'):
+    if os.path.exists('parent_page.html'):
         pass
     else:
         html = http_query(url)
@@ -105,6 +100,6 @@ if __name__ == '__main__':
 
     html = open_html()
     result_p = get_page_element(html)
-    modify_list(result_p)
-    #save_data(result)
-
+    id_res = get_id_attribute()
+    data = modify_list(result_p, id_res)
+    save_data(data)
